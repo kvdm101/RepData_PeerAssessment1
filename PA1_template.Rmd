@@ -2,11 +2,13 @@
 title: "Reproducible research assignment 1 on Activity monitoring data"
 author: "Karin"
 date: "Sunday, May 17, 2015"
-output: html_document
+output:
+  html_document:
+    fig_caption: yes
 ---
 Loading and preprocessing the data
 ```{r, echo=TRUE}
-#setwd("C:/Users/Karin-PC/Downloads/repdata_data_activity")
+setwd("C:/Users/Karin-PC/Downloads/repdata_data_activity")
 data_complete <- read.csv("activity.csv")
 library("dplyr")
 ```
@@ -88,4 +90,5 @@ xyplot(Ave.steps ~ interval | levels(day_tp),
    xlab = "Interval",
    ylab = "Average Number of steps",
    layout=c(1,2))
+'?knit2html'
 ```
