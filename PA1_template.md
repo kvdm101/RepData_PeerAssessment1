@@ -29,20 +29,22 @@ then group it my day to use in the summary when calculating the mean of the step
 
 ```r
 exNa <- filter(data_complete, steps >= 0)
+#Calculate the total number of steps taken per day
 by_day <- exNa %>% group_by(date)
-y <- by_day %>% summarise(Ave.steps = mean(steps))
-hist(y$Ave.steps, col = 'green', main = "Average steps per day", ylab = "Frequency", xlab = "Ave Steps")
+y <- by_day %>% summarise(Total.steps = sum(steps))
+#Make a histogram of the total number of steps taken each day
+hist(y$Total.steps, col = 'green', main = "Total steps per day", ylab = "Frequency", xlab = "No of Steps")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
 
 ```r
-x <- median(y$Ave.steps, na.rm = FALSE)
+x <- median(y$Total.steps, na.rm = FALSE)
 print(x)
 ```
 
 ```
-## [1] 37.37847
+## [1] 10765
 ```
 What is the average daily activity pattern?
 This chunk of code is using the dataset, excluding the NA's, grouping it by interval into morning, midday or evening.
@@ -55,6 +57,7 @@ z <- by_cat %>% summarise(Ave.steps = mean(steps))
 #add leading 0's
 z <- mutate(z, int2 = sprintf("%04d", as.numeric(interval)))
 z <- select(z, TimeOfDay, Ave.steps, int2)
+#Make a time series plot x- interval y - mean
 library(ggplot2)
 qplot(TimeOfDay, Ave.steps, data = z, color = TimeOfDay, ylab = "Average steps", xlab = "")
 ```
@@ -62,9 +65,9 @@ qplot(TimeOfDay, Ave.steps, data = z, color = TimeOfDay, ylab = "Average steps",
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
 
 ```r
+#which 5min interval on ave contains max no of steps
 by_int <- exNa %>% group_by(interval)
 Ave <- by_int %>% summarise(Ave.steps = mean(steps))
-#add leading 0's
 Ave <- mutate(Ave, interval = sprintf("%04d", as.numeric(interval)))
 Ave <- arrange(Ave, desc(Ave.steps))
 q2 <- Ave[1,]
@@ -83,7 +86,6 @@ The strategy that is used to fill the missing values is based on the average per
 Dataset temp is only collecting NA values from the complete dataset and then transformed to add the same columns as the dataset, excluding NA's to allow for a seamless merge later on.
 
 ```r
-#Count no of missing values using complete dataset
 testNA <- sum(is.na(data_complete$steps))
 print(testNA)
 ```
@@ -93,15 +95,15 @@ print(testNA)
 ```
 
 ```r
+#Strategy > use the ave per 5min interval to fill the missing data
 temp <- filter(data_complete, is.na(steps))
 temp <- mutate(temp, interval = sprintf("%04d", as.numeric(interval)))
-#Add average per 5min interval to missing step data
 temp <- full_join(temp, Ave, by = "interval")
 temp <- select(temp, date, interval, Ave.steps)
 temp <- rename(temp, steps = Ave.steps)
 temp <- mutate(temp, TimeOfDay = ifelse(interval < 1200, "Morning", ifelse(interval >= 1200 & interval < 1800, "Midday", "Eve")))
 data_excl <- mutate(data_excl, interval = sprintf("%04d", as.numeric(interval)))
-#Join NA and exclude NA data sets
+#Create a new dataset that is equal to the original dataset but with the missing #data filled in
 all_data <- full_join(temp, data_excl, by = NULL)
 ```
 
@@ -111,6 +113,7 @@ all_data <- full_join(temp, data_excl, by = NULL)
 
 ```r
 by_day2 <- all_data %>% group_by(date)
+y <- by_day %>% summarise(Ave.steps = mean(steps))
 y2 <- by_day2 %>% summarise(Ave.steps = mean(steps))
 par(mfrow = c(2, 1), mar = c(4, 4, 2, 1))
 hist(y$Ave.steps, col = 'green', main = "Average steps per day - NA excluded", ylab = "Frequency", xlab = "")
@@ -136,7 +139,7 @@ xyplot(Ave.steps ~ interval | levels(day_tp),
    data = x,
    type = "l",
    xlab = "Interval",
-   ylab = "Average Number of steps",
+   ylab = "Number of steps",
    layout=c(1,2))
 ```
 
