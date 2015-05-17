@@ -6,7 +6,7 @@ output: html_document
 ---
 Loading and preprocessing the data
 ```{r, echo=TRUE}
-setwd("C:/Users/Karin-PC/Downloads/repdata_data_activity")
+#setwd("C:/Users/Karin-PC/Downloads/repdata_data_activity")
 data_complete <- read.csv("activity.csv")
 library("dplyr")
 ```
